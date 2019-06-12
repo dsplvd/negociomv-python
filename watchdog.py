@@ -9,20 +9,20 @@ class ModHandler(pyinotify.ProcessEvent):
     count = 0
 
     def _restart_timer(self):
-        #print('==> RUN ENDED')
+        syslog.syslog('==> RUN ENDED')
         self.count = 0
 
     def _run_cmd(self):
-        #print('==> RUNNING')
+        syslog.syslog('==> RUNNING')
         timer = threading.Timer(30, self._restart_timer)
         timer.start()
 
-        runCompleteFlow = Popen(['python /home/pi/negociomv-python/complete.py'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
-        output, error = mountFilesystem.communicate()
+        runCompleteFlow = subprocess.Popen(['python /home/pi/negociomv-python/complete.py'], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=-1)
+        output, error = runCompleteFlow.communicate()
         if runCompleteFlow.returncode == 0:
-            print('Files uploaded successfully')
+            syslog.syslog('Files uploaded successfully')
         elif runCompleteFlow.returncode == 1:
-            print('Upload failed: %s' % (error))            
+            syslog.syslog('Upload failed: %s' % (error))
 
     # evt has useful properties, including pathname
     def process_IN_MODIFY(self, evt):
