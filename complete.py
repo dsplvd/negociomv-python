@@ -2,7 +2,9 @@ from __future__ import print_function
 from subprocess import Popen, PIPE
 import glob
 import os
-from pprint import pprint
+import json
+import requests
+#from pprint import pprint
 
 import pickle
 from googleapiclient.discovery import build
@@ -10,8 +12,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from apiclient.http import MediaFileUpload
 from apiclient.http import MediaFileUpload
-import json
-import requests
+
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
@@ -42,7 +43,7 @@ output, error = mountFilesystem.communicate()
 
 if mountFilesystem.returncode == 0:
 
-  pprint("Filesystem mounted, syncing files")
+  print("Filesystem mounted, syncing files")
 
   syncFiles = Popen(['rsync -Irc --exclude ".*" /mnt/usbfat32/ /home/pi/temp_files/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
 
@@ -50,7 +51,7 @@ if mountFilesystem.returncode == 0:
 
   if syncFiles.returncode == 0:
 
-    pprint("Files synced, unmounting and processing")
+    print("Files synced, unmounting and processing")
 
     unmountFilesystem = Popen(['sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
 
@@ -58,7 +59,7 @@ if mountFilesystem.returncode == 0:
 
     if unmountFilesystem.returncode == 0:
 
-      pprint("Unmount successful, uploading...")
+      print("Unmount successful, uploading...")
 
       # *** COMPLETED ***
       list_completed = glob.glob('/home/pi/temp_files/COMPLETED/*.CSV')
@@ -74,10 +75,10 @@ if mountFilesystem.returncode == 0:
         
         print ('File ID: %s' % (completed_upload.get('id')))      
 
-        pprint("COMPLETED processed, done")
+        print("COMPLETED processed, done")
 
       else:
-        pprint("No COMPLETED to upload, done")
+        print("No COMPLETED to upload, done")
 
       # *** TICKET ***
       list_ticket = glob.glob('/home/pi/temp_files/TICKET#/*.CSV')
@@ -93,27 +94,27 @@ if mountFilesystem.returncode == 0:
         
         print ('File ID: %s' % (ticket_upload.get('id')))      
 
-        pprint("TICKET processed, done")
+        print("TICKET processed, done")
         
       else:
-        pprint("No TICKET# to upload, done")        
+        print("No TICKET# to upload, done")        
 
     elif syncFiles.returncode == 1:
-       pprint('Cant find %s' % (error))
+       print('Cant find %s' % (error))
     else:
        assert syncFiles.returncode > 1
-       pprint('Error occurred: %s' % (error))
+       print('Error occurred: %s' % (error))
 
   elif syncFiles.returncode == 1:
-     pprint('Cant find %s' % (error))
+     print('Cant find %s' % (error))
   else:
      assert syncFiles.returncode > 1
-     pprint('Error occurred: %s' % (error))
+     print('Error occurred: %s' % (error))
 
 
 elif mountFilesystem.returncode == 1:
-  pprint('Cant find %s' % (error))
+  print('Cant find %s' % (error))
 else:
 	assert mountFilesystem.returncode > 1
-	pprint('Error occurred: %s' % (error))
+	print('Error occurred: %s' % (error))
 
