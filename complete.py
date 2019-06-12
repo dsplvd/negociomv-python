@@ -43,7 +43,7 @@ output, error = mountFilesystem.communicate()
 
 if mountFilesystem.returncode == 0:
 
-  print("Filesystem mounted, syncing files")
+  syslog.syslog("Filesystem mounted, syncing files")
 
   syncFiles = Popen(['rsync -Irc --exclude ".*" /mnt/usbfat32/ /home/pi/temp_files/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
 
@@ -51,7 +51,7 @@ if mountFilesystem.returncode == 0:
 
   if syncFiles.returncode == 0:
 
-    print("Files synced, unmounting and processing")
+    syslog.syslog("Files synced, unmounting and processing")
 
     unmountFilesystem = Popen(['sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
 
@@ -59,7 +59,7 @@ if mountFilesystem.returncode == 0:
 
     if unmountFilesystem.returncode == 0:
 
-      print("Unmount successful, uploading...")
+      syslog.syslog("Unmount successful, uploading...")
 
       # *** COMPLETED ***
       list_completed = glob.glob('/home/pi/temp_files/COMPLETED/*.CSV')
@@ -73,12 +73,12 @@ if mountFilesystem.returncode == 0:
         completed_media = MediaFileUpload(completed_latest, mimetype='text/csv')
         completed_upload = service.files().create(body=completed_file, media_body=completed_media, fields='id').execute()
         
-        print ('File ID: %s' % (completed_upload.get('id')))      
+        syslog.syslog ('File ID: %s' % (completed_upload.get('id')))      
 
-        print("COMPLETED processed, done")
+        syslog.syslog("COMPLETED processed, done")
 
       else:
-        print("No COMPLETED to upload, done")
+        syslog.syslog("No COMPLETED to upload, done")
 
       # *** TICKET ***
       list_ticket = glob.glob('/home/pi/temp_files/TICKET#/*.CSV')
@@ -92,29 +92,29 @@ if mountFilesystem.returncode == 0:
         ticket_media = MediaFileUpload(ticket_latest, mimetype='text/csv')
         ticket_upload = service.files().create(body=ticket_file, media_body=ticket_media, fields='id').execute()
         
-        print ('File ID: %s' % (ticket_upload.get('id')))      
+        syslog.syslog ('File ID: %s' % (ticket_upload.get('id')))      
 
-        print("TICKET processed, done")
+        syslog.syslog("TICKET processed, done")
         
       else:
-        print("No TICKET# to upload, done")        
+        syslog.syslog("No TICKET# to upload, done")        
 
     elif syncFiles.returncode == 1:
-       print('Cant find %s' % (error))
+       syslog.syslog('Cant find %s' % (error))
     else:
        assert syncFiles.returncode > 1
-       print('Error occurred: %s' % (error))
+       syslog.syslog('Error occurred: %s' % (error))
 
   elif syncFiles.returncode == 1:
-     print('Cant find %s' % (error))
+     syslog.syslog('Cant find %s' % (error))
   else:
      assert syncFiles.returncode > 1
-     print('Error occurred: %s' % (error))
+     syslog.syslog('Error occurred: %s' % (error))
 
 
 elif mountFilesystem.returncode == 1:
-  print('Cant find %s' % (error))
+  syslog.syslog('Cant find %s' % (error))
 else:
 	assert mountFilesystem.returncode > 1
-	print('Error occurred: %s' % (error))
+	syslog.syslog('Error occurred: %s' % (error))
 

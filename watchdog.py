@@ -3,6 +3,7 @@ import subprocess
 import sys
 import time
 import threading
+import syslog
 
 class ModHandler(pyinotify.ProcessEvent):
     count = 0
@@ -25,7 +26,7 @@ class ModHandler(pyinotify.ProcessEvent):
 
     # evt has useful properties, including pathname
     def process_IN_MODIFY(self, evt):
-        print('Data changed')
+        syslog.syslog('Data changed')
         if self.count < 1:
             self._run_cmd()
 	self.count +=1
