@@ -13,14 +13,14 @@ class ModHandler(pyinotify.ProcessEvent):
         self.count = 0
 
     def _upload_files(self):
-        syslog.syslog('*** UPLOADING COMPLETED FILES & TICKETS ***')
+        syslog.syslog('==> Processing USB Storage...')
         runCompleteFlow = subprocess.Popen(['python /home/pi/negociomv-python/complete.py'], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=-1)
         output, error = runCompleteFlow.communicate()
         if runCompleteFlow.returncode == 0:
-            syslog.syslog('*** Files uploaded successfully ***')
+            syslog.syslog('==> Files uploaded successfully')
 	    self.count = 0
         elif runCompleteFlow.returncode == 1:
-            syslog.syslog('*** Upload failed: %s ***' % (error))
+            syslog.syslog('==> Upload failed: %s ***' % (error))
 	    self.count = 0
 
     def _run_cmd(self):
