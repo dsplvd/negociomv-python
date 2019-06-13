@@ -3,6 +3,7 @@ import glob
 import os
 import json
 import requests
+import syslog
 #from pprint import pprint
 
 import pickle

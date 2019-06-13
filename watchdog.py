@@ -18,14 +18,15 @@ class ModHandler(pyinotify.ProcessEvent):
         output, error = runCompleteFlow.communicate()
         if runCompleteFlow.returncode == 0:
             syslog.syslog('*** Files uploaded successfully ***')
+	    self.count = 0
         elif runCompleteFlow.returncode == 1:
             syslog.syslog('*** Upload failed: %s ***' % (error))
-        self.count = 0
+	    self.count = 0
 
     def _run_cmd(self):
-        syslog.syslog('==> Restarting timer...')
-        uploadFiles = threading.Thread(self._restart_timer, args=())
-        timer.start()
+        syslog.syslog('==> Uploading files...')
+        uploadFiles = threading.Thread(target=self._upload_files)
+        uploadFiles.start()
 
     # evt has useful properties, including pathname
     def process_IN_MODIFY(self, evt):
