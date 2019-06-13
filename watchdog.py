@@ -13,12 +13,13 @@ class ModHandler(pyinotify.ProcessEvent):
         self.count = 0
 
     def _upload_files(self):
+        syslog.syslog('*** UPLOADING COMPLETED FILES & TICKETS ***')
         runCompleteFlow = subprocess.Popen(['python /home/pi/negociomv-python/complete.py'], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=-1)
         output, error = runCompleteFlow.communicate()
         if runCompleteFlow.returncode == 0:
-            syslog.syslog('Files uploaded successfully')
+            syslog.syslog('*** Files uploaded successfully ***')
         elif runCompleteFlow.returncode == 1:
-            syslog.syslog('Upload failed: %s' % (error))
+            syslog.syslog('*** Upload failed: %s ***' % (error))
         self.count = 0
 
     def _run_cmd(self):
@@ -28,11 +29,13 @@ class ModHandler(pyinotify.ProcessEvent):
 
     # evt has useful properties, including pathname
     def process_IN_MODIFY(self, evt):
-        syslog.syslog('Data changed')
+        syslog.syslog('*** PISUSB MODIFIED ***')
         if self.count < 1:
             self._run_cmd()
 	self.count +=1
 
+
+syslog.syslog('*** STARTING PIUSB WATCHDOG ***')
 handler = ModHandler()
 wm = pyinotify.WatchManager()
 notifier = pyinotify.Notifier(wm, handler)
