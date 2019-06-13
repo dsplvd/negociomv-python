@@ -45,7 +45,7 @@ class ModHandler(pyinotify.ProcessEvent):
         syslog.syslog('*** PISUSB MODIFIED ***')
         if self.count < 1:
             self._run_cmd()
-  self.count +=1
+        self.count +=1
 
 
 syslog.syslog('*** STARTING PIUSB WATCHDOG ***')
