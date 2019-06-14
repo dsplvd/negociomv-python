@@ -100,8 +100,8 @@ def ProcessData():
 class ModHandler(pyinotify.ProcessEvent):
     count = 0
 
-    def _restart_timer(self):
-        syslog.syslog('==> Timer restarted')
+    def _enable_watchdog(self):
+        syslog.syslog('==> Watchdog enabled')
         self.count = 0
 
     def _upload_files(self):
@@ -115,12 +115,14 @@ class ModHandler(pyinotify.ProcessEvent):
         #     syslog.syslog('==> Upload failed: %s ***' % (error))
         #     self.count = 0
         ProcessData()
-        self.count = 0
+        # self.count = 0
 
     def _run_cmd(self):
-        syslog.syslog('==> Uploading files...')
+        syslog.syslog('==> Uploading files..., Watchdog disabled')
         uploadFiles = threading.Thread(target=self._upload_files)
         uploadFiles.start()
+        enableWatchdog = threading.Timer(180, self._enable_watchdog)
+        enableWatchdog.start()
 
     # evt has useful properties, including pathname
     def process_IN_MODIFY(self, evt):
