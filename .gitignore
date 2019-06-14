@@ -105,3 +105,7 @@ venv.bak/
 
 .DS_Store
 tocken.pickle
+complete.build/
+qs.build/
+watchdog.build/
+watchdog.bin
