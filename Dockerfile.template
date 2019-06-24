@@ -23,4 +23,4 @@ COPY . ./
 ENV INITSYSTEM on
 
 # setup-i2c.sh will run when container starts up on the device
-#CMD ["bash", "python solid.py"]
+CMD ["bash", "python solid.py"]
