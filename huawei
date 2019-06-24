@@ -1,0 +1,22 @@
+/dev/ttyAMA0
+#connect '/usr/sbin/chat -v -f /etc/ppp/peers/huawei-on'
+#disconnect '/usr/sbin/chat -v -f /etc/ppp/peers/huawei-off'
+connect "/usr/sbin/chat -v -f /etc/chatscripts/gprs2 -T bam.entelpcs.cl"
+115200
+debug
+nodetach
+#hide-password
+# Get the IP address from ISP.
+noipdefault
+# Also get DNS entries
+usepeerdns
+# Set the route as default to the Internet
+defaultroute
+# pppd will reconnect after disconnection
+persist
+# Don't auth the remote site
+noauth
+# No need to check hardware flow on serial port
+nocrtscts
+# No need to send control lines for modem
+local

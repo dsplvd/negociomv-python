@@ -12,6 +12,9 @@ WORKDIR /usr/src/app
 
 # Copy requirements.txt first for better cache on later pushes
 COPY ./requirements.txt /requirements.txt
+COPY gprs2 /etc/chatscripts/
+COPY huawei /etc/ppp/peers/
+
 
 # pip install python deps from requirements.txt on the resin.io build server
 RUN pip install -r /requirements.txt
@@ -23,4 +26,5 @@ COPY . ./
 ENV INITSYSTEM on
 
 # setup-i2c.sh will run when container starts up on the device
-CMD ["bash", "python solid.py"]
+CMD ["bash", "pon huawei"]
+CMD ["bash", "start.sh"]
