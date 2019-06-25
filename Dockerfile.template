@@ -15,8 +15,6 @@ COPY ./requirements.txt /requirements.txt
 COPY gprs2 /etc/chatscripts/
 COPY huawei /etc/ppp/peers/
 
-#RUN pon huawei
-
 # pip install python deps from requirements.txt on the resin.io build server
 RUN pip install -r /requirements.txt
 
@@ -27,5 +25,7 @@ COPY . ./
 ENV INITSYSTEM on
 
 # setup-i2c.sh will run when container starts up on the device
-CMD ["bash", "pon huawei"]
+#CMD ["bash", "python gpio.py && pon huawei"]
+#CMD ["bash", "pon huawei"]
+RUN echo "LABEL=usbfat32 /mnt/usbfat32 vfat auto defaults 0 0" >> /etc/fstab
 CMD ["bash", "start.sh"]
