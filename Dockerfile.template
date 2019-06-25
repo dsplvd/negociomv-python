@@ -1,6 +1,6 @@
 # base-image for python on any machine using a template variable,
 # see more about dockerfile templates here:http://docs.resin.io/pages/deployment/docker-templates
-FROM resin/%%RESIN_MACHINE_NAME%%-python
+FROM resin/%%RESIN_MACHINE_NAME%%-debian-python
 
 # use apt-get if you need to install dependencies
 RUN apt-get update && apt-get install -yq \
@@ -15,7 +15,7 @@ COPY ./requirements.txt /requirements.txt
 COPY gprs2 /etc/chatscripts/
 COPY huawei /etc/ppp/peers/
 
-RUN /usr/bin/pon huawei
+RUN pon huawei
 
 # pip install python deps from requirements.txt on the resin.io build server
 RUN pip install -r /requirements.txt
