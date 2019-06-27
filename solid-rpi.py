@@ -20,24 +20,24 @@ from apiclient.http import MediaFileUpload
 import RPi.GPIO as GPIO
 
 def ProcessData():
-    print("==> Waiting for files...")
+    syslog.syslog("==> Waiting for files...")
     time.sleep(10)
     mountFilesystem = Popen(['mkdir -p /mnt/usbfat32 && sudo mount -o ro /home/pi/piusb.bin /mnt/usbfat32'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
     output, error = mountFilesystem.communicate()
     if mountFilesystem.returncode == 0:
-      print("==> Filesystem mounted, syncing files...")
+      syslog.syslog("==> Filesystem mounted, syncing files...")
       syncFiles = Popen(['rsync -Irc --exclude ".*" /mnt/usbfat32/ /home/pi/temp_files/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
       output, error = syncFiles.communicate()
 
       if syncFiles.returncode == 0:
 
-        print("==> Files synced, unmounting and processing...")
+        syslog.syslog("==> Files synced, unmounting and processing...")
         unmountFilesystem = Popen(['sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
         output, error = unmountFilesystem.communicate()
 
         if unmountFilesystem.returncode == 0:
 
-          print("==> Unmount successful, uploading...")
+          syslog.syslog("==> Unmount successful, uploading...")
 
           # *** COMPLETED ***
           list_completed = glob.glob('/home/pi/temp_files/COMPLETED/*.CSV')
@@ -51,12 +51,12 @@ def ProcessData():
             completed_media = MediaFileUpload(completed_latest, mimetype='text/csv')
             completed_upload = service.files().create(body=completed_file, media_body=completed_media, fields='id').execute()
             
-            print ('==> COMPLETED File ID: %s' % (completed_upload.get('id')))      
+            syslog.syslog ('==> COMPLETED File ID: %s' % (completed_upload.get('id')))      
 
-            print("==> COMPLETED processed, done")
+            syslog.syslog("==> COMPLETED processed, done")
 
           else:
-            print("==> No COMPLETED to upload, done")
+            syslog.syslog("==> No COMPLETED to upload, done")
 
           # *** TICKET ***
           list_ticket = glob.glob('/home/pi/temp_files/TICKET#/*.CSV')
@@ -70,56 +70,56 @@ def ProcessData():
             ticket_media = MediaFileUpload(ticket_latest, mimetype='text/csv')
             ticket_upload = service.files().create(body=ticket_file, media_body=ticket_media, fields='id').execute()
             
-            print ('==> TICKET File ID: %s' % (ticket_upload.get('id')))      
+            syslog.syslog ('==> TICKET File ID: %s' % (ticket_upload.get('id')))      
 
-            print("==> TICKET processed, done")
+            syslog.syslog("==> TICKET processed, done")
             
           else:
-            print("==> No TICKET# to upload, done")        
+            syslog.syslog("==> No TICKET# to upload, done")        
 
         elif syncFiles.returncode == 1:
-           print('==> Cant find %s' % (error))
+           syslog.syslog('==> Cant find %s' % (error))
         else:
            assert syncFiles.returncode > 1
-           print('==> Error occurred: %s' % (error))
+           syslog.syslog('==> Error occurred: %s' % (error))
 
       elif syncFiles.returncode == 1:
-         print('==> Cant find %s' % (error))
+         syslog.syslog('==> Cant find %s' % (error))
       else:
          assert syncFiles.returncode > 1
-         print('==> Error occurred: %s' % (error))
+         syslog.syslog('==> Error occurred: %s' % (error))
 
 
     elif mountFilesystem.returncode == 1:
-      print('==> Cant find %s, unmounting...' % (error))
+      syslog.syslog('==> Cant find %s, unmounting...' % (error))
       Popen(['sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
     else:
       assert mountFilesystem.returncode > 1
-      print('Error occurred: %s, unmounting...' % (error))
+      syslog.syslog('Error occurred: %s, unmounting...' % (error))
       Popen(['sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
 
 class ModHandler(pyinotify.ProcessEvent):
     count = 0
 
     def _enable_watchdog(self):
-        print('==> Watchdog enabled')
+        syslog.syslog('==> Watchdog enabled')
         self.count = 0
 
     def _upload_files(self):
-        print('==> Processing USB Storage, ignoring further modifications...')
+        syslog.syslog('==> Processing USB Storage, ignoring further modifications...')
         # runCompleteFlow = Popen(['python /home/pi/negociomv-python/complete.py'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
         # output, error = runCompleteFlow.communicate()
         # if runCompleteFlow.returncode == 0:
-        #     print('==> Files uploaded successfully')
+        #     syslog.syslog('==> Files uploaded successfully')
         #     self.count = 0
         # elif runCompleteFlow.returncode == 1:
-        #     print('==> Upload failed: %s ***' % (error))
+        #     syslog.syslog('==> Upload failed: %s ***' % (error))
         #     self.count = 0
         ProcessData()
         # self.count = 0
 
     def _run_cmd(self):
-        print('==> Uploading files..., Watchdog disabled')
+        syslog.syslog('==> Uploading files..., Watchdog disabled')
         uploadFiles = threading.Thread(target=self._upload_files)
         uploadFiles.start()
         enableWatchdog = threading.Timer(180, self._enable_watchdog)
@@ -128,15 +128,15 @@ class ModHandler(pyinotify.ProcessEvent):
     # evt has useful properties, including pathname
     def process_IN_MODIFY(self, evt):
         if self.count < 1:
-            print('==> Filesystem modified')
+            syslog.syslog('==> Filesystem modified')
             self._run_cmd()
         else:
-            print('==> Filesystem modified but ignored')
+            syslog.syslog('==> Filesystem modified but ignored')
         self.count +=1
 
-print('*** NEGOCIOMV STARTED ***')
+syslog.syslog('*** NEGOCIOMV STARTED ***')
 
-print('==> Restarting modem...')
+syslog.syslog('==> Restarting modem...')
    
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(26, GPIO.OUT)
@@ -147,7 +147,7 @@ GPIO.output(26, False)
    
 GPIO.cleanup()
 
-print('==> Starting PPP interface...')
+syslog.syslog('==> Starting PPP interface...')
 
 startPPP = Popen(['sleep 10 && sudo pon huawei'], shell=True, stdin=None, stdout=None, stderr=None, bufsize=-1)
 
@@ -174,11 +174,11 @@ if not creds or not creds.valid:
 
 service = build('drive', 'v3', credentials=creds)
 
-print('==> Drive API Login correct, uploading files on boot...')
+syslog.syslog('==> Drive API Login correct, uploading files on boot...')
 
 ProcessData()
 
-print('*** STARTING PIUSB WATCHDOG ***')
+syslog.syslog('*** STARTING PIUSB WATCHDOG ***')
 handler = ModHandler()
 wm = pyinotify.WatchManager()
 notifier = pyinotify.Notifier(wm, handler)
