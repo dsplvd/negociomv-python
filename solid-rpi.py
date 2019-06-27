@@ -22,7 +22,7 @@ import RPi.GPIO as GPIO
 def ProcessData():
     print("==> Waiting for files...")
     time.sleep(10)
-    mountFilesystem = Popen(['mkdir -p /mnt/usbfat32 && mount -o ro /home/pi/piusb.bin /mnt/usbfat32'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
+    mountFilesystem = Popen(['mkdir -p /mnt/usbfat32 && sudo mount -o ro /home/pi/piusb.bin /mnt/usbfat32'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
     output, error = mountFilesystem.communicate()
     if mountFilesystem.returncode == 0:
       print("==> Filesystem mounted, syncing files...")
@@ -32,7 +32,7 @@ def ProcessData():
       if syncFiles.returncode == 0:
 
         print("==> Files synced, unmounting and processing...")
-        unmountFilesystem = Popen(['umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
+        unmountFilesystem = Popen(['sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
         output, error = unmountFilesystem.communicate()
 
         if unmountFilesystem.returncode == 0:
@@ -92,11 +92,11 @@ def ProcessData():
 
     elif mountFilesystem.returncode == 1:
       print('==> Cant find %s, unmounting...' % (error))
-      Popen(['umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
+      Popen(['sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
     else:
       assert mountFilesystem.returncode > 1
       print('Error occurred: %s, unmounting...' % (error))
-      Popen(['umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
+      Popen(['sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
 
 class ModHandler(pyinotify.ProcessEvent):
     count = 0
