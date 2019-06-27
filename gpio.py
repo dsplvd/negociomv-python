@@ -2,6 +2,8 @@
    
 import RPi.GPIO as GPIO
 import time
+
+print('Restarting modem...')
    
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(26, GPIO.OUT)

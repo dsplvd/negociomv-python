@@ -4,7 +4,7 @@ FROM resin/%%RESIN_MACHINE_NAME%%-python
 
 # use apt-get if you need to install dependencies
 RUN apt-get update && apt-get install -yq \
-		python-smbus ppp && \
+		python-smbus ppp dosfstools rsync && \
 		apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set our working directory
@@ -27,5 +27,6 @@ ENV INITSYSTEM on
 # setup-i2c.sh will run when container starts up on the device
 #CMD ["bash", "python gpio.py && pon huawei"]
 #CMD ["bash", "pon huawei"]
-RUN echo "LABEL=usbfat32 /mnt/usbfat32 vfat auto defaults 0 0" >> /etc/fstab
-CMD ["bash", "start.sh"]
+#RUN echo "LABEL=usbfat32 /mnt/usbfat32 vfat auto defaults 0 0" >> /etc/fstab
+#RUN bash /usr/src/app/start.sh
+CMD ["bash", "/usr/src/app/start.sh"]
