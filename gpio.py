@@ -2,8 +2,9 @@
    
 import RPi.GPIO as GPIO
 import time
+import syslog
 
-print('Restarting modem...')
+syslog.syslog('==> Restarting modem...')
    
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(26, GPIO.OUT)

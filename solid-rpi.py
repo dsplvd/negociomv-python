@@ -136,16 +136,16 @@ class ModHandler(pyinotify.ProcessEvent):
 
 syslog.syslog('*** NEGOCIOMV STARTED ***')
 
-syslog.syslog('==> Restarting modem...')
+# syslog.syslog('==> Restarting modem...')
    
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(26, GPIO.OUT)
+# GPIO.setmode(GPIO.BCM)
+# GPIO.setup(26, GPIO.OUT)
    
-GPIO.output(26, True)
-time.sleep(2)
-GPIO.output(26, False)
+# GPIO.output(26, True)
+# time.sleep(2)
+# GPIO.output(26, False)
    
-GPIO.cleanup()
+# GPIO.cleanup()
 
 syslog.syslog('==> Starting PPP interface...')
 
