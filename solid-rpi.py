@@ -147,9 +147,9 @@ syslog.syslog('*** NEGOCIOMV STARTED ***')
    
 # GPIO.cleanup()
 
-syslog.syslog('==> Starting PPP interface...')
+#syslog.syslog('==> Starting PPP interface...')
 
-startPPP = Popen(['sleep 10 && sudo pon huawei &'], shell=True, stdin=None, stdout=None, stderr=None, bufsize=-1)
+#startPPP = Popen(['sleep 10 && sudo pon huawei &'], shell=True, stdin=None, stdout=None, stderr=None, bufsize=-1)
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
@@ -176,8 +176,6 @@ service = build('drive', 'v3', credentials=creds)
 
 syslog.syslog('==> Drive API Login correct, uploading files on boot...')
 
-syslog.syslog('==> Waiting for GSM connectivity...')
-time.sleep(140)
 ProcessData()
 
 syslog.syslog('*** STARTING PIUSB WATCHDOG ***')
