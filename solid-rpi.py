@@ -22,11 +22,11 @@ import RPi.GPIO as GPIO
 def ProcessData():
     print("==> Waiting for files...")
     time.sleep(10)
-    mountFilesystem = Popen(['mkdir -p /mnt/usbfat32 && mount -o ro /data/piusb.bin /mnt/usbfat32'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
+    mountFilesystem = Popen(['mkdir -p /mnt/usbfat32 && mount -o ro /home/pi/piusb.bin /mnt/usbfat32'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
     output, error = mountFilesystem.communicate()
     if mountFilesystem.returncode == 0:
       print("==> Filesystem mounted, syncing files...")
-      syncFiles = Popen(['rsync -Irc --exclude ".*" /mnt/usbfat32/ /data/temp_files/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
+      syncFiles = Popen(['rsync -Irc --exclude ".*" /mnt/usbfat32/ /home/pi/temp_files/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
       output, error = syncFiles.communicate()
 
       if syncFiles.returncode == 0:
@@ -40,7 +40,7 @@ def ProcessData():
           print("==> Unmount successful, uploading...")
 
           # *** COMPLETED ***
-          list_completed = glob.glob('/data/temp_files/COMPLETED/*.CSV')
+          list_completed = glob.glob('/home/pi/temp_files/COMPLETED/*.CSV')
           if len(list_completed) != 0:
 
             # completed_latest = max(list_completed, key=os.path.getctime)
@@ -59,7 +59,7 @@ def ProcessData():
             print("==> No COMPLETED to upload, done")
 
           # *** TICKET ***
-          list_ticket = glob.glob('/data/temp_files/TICKET#/*.CSV')
+          list_ticket = glob.glob('/home/pi/temp_files/TICKET#/*.CSV')
           if len(list_ticket) != 0:
 
             # ticket_latest = max(list_ticket, key=os.path.getctime)
@@ -149,7 +149,7 @@ GPIO.cleanup()
 
 print('==> Starting PPP interface...')
 
-startPPP = Popen(['sudo pon huawei'], shell=True, stdin=None, stdout=None, stderr=None, bufsize=-1)
+startPPP = Popen(['sleep 10 && sudo pon huawei'], shell=True, stdin=None, stdout=None, stderr=None, bufsize=-1)
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
@@ -182,5 +182,5 @@ print('*** STARTING PIUSB WATCHDOG ***')
 handler = ModHandler()
 wm = pyinotify.WatchManager()
 notifier = pyinotify.Notifier(wm, handler)
-wdd = wm.add_watch('/data/piusb.bin', pyinotify.IN_MODIFY)
+wdd = wm.add_watch('/home/pi/piusb.bin', pyinotify.IN_MODIFY)
 notifier.loop()
