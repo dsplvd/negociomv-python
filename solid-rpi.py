@@ -176,6 +176,8 @@ service = build('drive', 'v3', credentials=creds)
 
 syslog.syslog('==> Drive API Login correct, uploading files on boot...')
 
+syslog.syslog('==> Waiting for GSM connectivity...')
+time.sleep(140)
 ProcessData()
 
 syslog.syslog('*** STARTING PIUSB WATCHDOG ***')
