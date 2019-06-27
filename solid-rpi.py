@@ -149,7 +149,7 @@ syslog.syslog('*** NEGOCIOMV STARTED ***')
 
 #syslog.syslog('==> Starting PPP interface...')
 
-#startPPP = Popen(['sleep 10 && sudo pon huawei &'], shell=True, stdin=None, stdout=None, stderr=None, bufsize=-1)
+#startPPP = Popen(['sudo pon huawei'], shell=True, stdin=None, stdout=None, stderr=None, bufsize=-1)
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
