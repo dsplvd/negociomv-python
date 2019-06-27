@@ -149,7 +149,7 @@ GPIO.cleanup()
 
 print('==> Starting PPP interface...')
 
-startPPP = Popen(['pon huawei'], shell=True, stdin=None, stdout=None, stderr=None, bufsize=-1)
+startPPP = Popen(['pon huawei &'], shell=True, stdin=None, stdout=None, stderr=None, bufsize=-1)
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
@@ -176,6 +176,7 @@ service = build('drive', 'v3', credentials=creds)
 
 print('==> Drive API Login correct, uploading files on boot...')
 
+time.sleep(120)
 ProcessData()
 
 print('*** STARTING PIUSB WATCHDOG ***')
