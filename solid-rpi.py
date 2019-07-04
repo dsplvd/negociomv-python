@@ -26,7 +26,7 @@ def ProcessData():
     output, error = mountFilesystem.communicate()
     if mountFilesystem.returncode == 0:
       syslog.syslog("==> Filesystem mounted, syncing files...")
-      syncFiles = Popen(['rsync -Irc --exclude ".*" /mnt/usbfat32/ /home/pi/temp_files/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
+      syncFiles = Popen(['rm -rf /home/pi/temp_files && mkdir /home/pi/temp_files && rsync -Irc --exclude ".*" /mnt/usbfat32/ /home/pi/temp_files/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
       output, error = syncFiles.communicate()
 
       if syncFiles.returncode == 0:
