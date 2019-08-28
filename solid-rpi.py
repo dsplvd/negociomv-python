@@ -21,7 +21,7 @@ import RPi.GPIO as GPIO
 
 def ProcessData():
     syslog.syslog("==> Waiting for files...")
-    time.sleep(10)
+    time.sleep(15)
     mountFilesystem = Popen(['mkdir -p /mnt/usbfat32 && sudo mount -o ro /home/pi/piusb.bin /mnt/usbfat32'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
     output, error = mountFilesystem.communicate()
     if mountFilesystem.returncode == 0:
