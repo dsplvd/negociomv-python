@@ -3,6 +3,7 @@ import sys
 import time
 import threading
 import syslog
+from datetime import datetime
 
 from subprocess import Popen, PIPE
 import glob
@@ -44,16 +45,24 @@ def ProcessData():
           if len(list_completed) != 0:
 
             # completed_latest = max(list_completed, key=os.path.getctime)
-            completed_latest = sorted(list_completed)[-1]
-            completed_latest_filename = os.path.basename(completed_latest)
+            # completed_latest = sorted(list_completed)[-1]
+            # completed_latest_filename = os.path.basename(completed_latest)
 
-            completed_file = {'name': completed_latest_filename, 'parents': ['1iuLUfvco6cMEo5CmwHj3X-jFis27CgZE']}
-            completed_media = MediaFileUpload(completed_latest, mimetype='text/csv')
-            completed_upload = service.files().create(body=completed_file, media_body=completed_media, fields='id').execute()
+            completed_latest = '/home/pi/temp_files/COMPLETED/'+str(datetime.now().year)+'MO'+str(datetime.now().month)+'.CSV'
+            completed_latest_filename = str(datetime.now().year)+'MO'+str(datetime.now().month)+'.CSV'
+
+            if os.path.isfile(completed_latest_filename):
+
+              completed_file = {'name': completed_latest_filename, 'parents': ['1iuLUfvco6cMEo5CmwHj3X-jFis27CgZE']}
+              completed_media = MediaFileUpload(completed_latest, mimetype='text/csv')
+              completed_upload = service.files().create(body=completed_file, media_body=completed_media, fields='id').execute()
             
-            syslog.syslog ('==> COMPLETED File ID: %s' % (completed_upload.get('id')))      
+              syslog.syslog ('==> COMPLETED File ID: %s' % (completed_upload.get('id')))      
 
-            syslog.syslog("==> COMPLETED processed, done")
+              syslog.syslog("==> COMPLETED processed, done")
+
+            else:
+              syslog.syslog("==> FILE NOT FOUND")
 
           else:
             syslog.syslog("==> No COMPLETED to upload, done")
@@ -142,7 +151,6 @@ gitPull = Popen(['cd /home/pi/negociomv-python/ && git pull'], shell=True, stdin
 
 # syslog.syslog('==> Restarting modem...')
    
-# GPIO.setmode(GPIO.BCM)
 # GPIO.setup(26, GPIO.OUT)
    
 # GPIO.output(26, True)
