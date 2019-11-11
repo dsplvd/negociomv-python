@@ -27,7 +27,7 @@ def ProcessData():
     if not os.path.isfile('/home/pi/piusb.bin'):
       syslog.syslog("==> Bin file not found, creating bin file and mounting...")
       createBinFile = Popen(['sudo dd bs=1M if=/dev/zero of=/home/pi/piusb.bin count=64 && sudo mkdosfs /home/pi/piusb.bin -F 32 -I'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
-      time.sleep(5)
+      time.sleep(7)
     else:
       syslog.syslog("==> Bin file found, mounting...")
 
