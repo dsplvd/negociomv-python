@@ -25,10 +25,10 @@ def ProcessData():
     time.sleep(15)
 
     if not os.path.isfile('/home/pi/piusb.bin'):
-      syslog.syslog("==> Bin file not found, creating bin file and mounting...")
-      createBinFile = Popen(['sudo dd bs=1M if=/dev/zero of=/home/pi/piusb.bin count=16 && sudo mkdosfs /home/pi/piusb.bin -F 32 -I'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
+       syslog.syslog("==> Bin file not found, creating bin file and mounting...")
+       createBinFile = Popen(['sudo dd bs=1M if=/dev/zero of=/home/pi/piusb.bin count=16 && sudo mkdosfs /home/pi/piusb.bin -F 32 -I'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
     else:
-      syslog.syslog("==> Bin file found, mounting..."
+       syslog.syslog("==> Bin file found, mounting..."
 
     mountFilesystem = Popen(['mkdir -p /mnt/usbfat32 && sudo mount -o ro /home/pi/piusb.bin /mnt/usbfat32'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
     output, error = mountFilesystem.communicate()
