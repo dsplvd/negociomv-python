@@ -67,7 +67,8 @@ def ProcessData():
             
               syslog.syslog ('==> COMPLETED File ID: %s' % (completed_upload.get('id')))      
 
-              syslog.syslog("==> COMPLETED processed, done")
+              syslog.syslog("==> COMPLETED processed, DELETING BIN FILES FOR GOOD MEASURE")
+              deleteBinFiles = Popen(['mkdir -p /mnt/usbfat32 && sudo mount -o ro /home/pi/piusb.bin /mnt/usbfat32 && sudo rm -rf /mnt/usbfat32/*.* && sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
 
             else:
               syslog.syslog("==> FILE NOT FOUND, DELETING BIN FILES")
