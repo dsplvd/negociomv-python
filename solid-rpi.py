@@ -68,11 +68,11 @@ def ProcessData():
               syslog.syslog ('==> COMPLETED File ID: %s' % (completed_upload.get('id')))      
 
               syslog.syslog("==> COMPLETED processed, DELETING BIN FILES FOR GOOD MEASURE")
-              deleteBinFiles = Popen(['mkdir -p /mnt/usbfat32 && sudo mount -o ro /home/pi/piusb.bin /mnt/usbfat32 && sudo rm -rf /mnt/usbfat32/COMPLETED/*.* && sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
+              deleteBinFiles = Popen(['mkdir -p /mnt/usbfat32 && sudo mount -o rw /home/pi/piusb.bin /mnt/usbfat32 && sudo rm -rf /mnt/usbfat32/COMPLETED/*.* && sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
 
             else:
               syslog.syslog("==> FILE NOT FOUND, DELETING BIN FILES")
-              deleteBinFiles = Popen(['mkdir -p /mnt/usbfat32 && sudo mount -o ro /home/pi/piusb.bin /mnt/usbfat32 && sudo rm -rf /mnt/usbfat32/COMPLETED/*.* && sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
+              deleteBinFiles = Popen(['mkdir -p /mnt/usbfat32 && sudo mount -o rw /home/pi/piusb.bin /mnt/usbfat32 && sudo rm -rf /mnt/usbfat32/COMPLETED/*.* && sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
 
           else:
             syslog.syslog("==> No COMPLETED to upload, done")
@@ -81,17 +81,22 @@ def ProcessData():
           list_ticket = glob.glob('/home/pi/temp_files/TICKET#/*.CSV')
           if len(list_ticket) != 0:
 
-            # ticket_latest = max(list_ticket, key=os.path.getctime)
-            ticket_latest = sorted(list_ticket)[-1]
-            ticket_latest_filename = os.path.basename(ticket_latest)
+            #ticket_latest = max(list_ticket, key=os.path.getctime)
+            #ticket_latest = sorted(list_ticket)[-1]
+            #ticket_latest_filename = os.path.basename(ticket_latest)
 
-            ticket_file = {'name': ticket_latest_filename, 'parents': ['1KChS1VhzSPdffXQ2u3D4YVt9Bw8mUInl']}
-            ticket_media = MediaFileUpload(ticket_latest, mimetype='text/csv')
+            createBigCsv = Popen(['cd /home/pi/temp_files/TICKET#/ && sed "" *.CSV > bigfile.csv'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
+
+            ticket_file = {'name': 'bigfile.csv', 'parents': ['1KChS1VhzSPdffXQ2u3D4YVt9Bw8mUInl']}
+            ticket_media = MediaFileUpload('/home/pi/temp_files/TICKET#/bigfile.csv', mimetype='text/csv')
             ticket_upload = service.files().create(body=ticket_file, media_body=ticket_media, fields='id').execute()
             
             syslog.syslog ('==> TICKET File ID: %s' % (ticket_upload.get('id')))      
 
             syslog.syslog("==> TICKET processed, done")
+
+            deleteTicketFiles = Popen(['mkdir -p /mnt/usbfat32 && sudo mount -o rw /home/pi/piusb.bin /mnt/usbfat32 && sudo rm -rf /mnt/usbfat32/TICKET#/*.* && sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
+
             
           else:
             syslog.syslog("==> No TICKET# to upload, done")        
