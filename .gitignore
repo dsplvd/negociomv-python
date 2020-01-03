@@ -104,7 +104,6 @@ venv.bak/
 .mypy_cache/
 
 .DS_Store
-tocken.pickle
 complete.build/
 qs.build/
 watchdog.build/
