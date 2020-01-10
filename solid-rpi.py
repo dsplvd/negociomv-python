@@ -86,8 +86,8 @@ def ProcessData():
             #ticket_latest_filename = os.path.basename(ticket_latest)
 
             createBigCsv = Popen(['sed \'\' /home/pi/temp_files/TICKET#/*.CSV > /home/pi/temp_files/TICKET#/bigfile.csv'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
-            time.sleep(3);
-            
+            time.sleep(5);
+
             ticket_file = {'name': 'bigfile.csv', 'parents': ['1KChS1VhzSPdffXQ2u3D4YVt9Bw8mUInl']}
             ticket_media = MediaFileUpload('/home/pi/temp_files/TICKET#/bigfile.csv', mimetype='text/csv')
             ticket_upload = service.files().create(body=ticket_file, media_body=ticket_media, fields='id').execute()
