@@ -162,7 +162,7 @@ syslog.syslog('*** NEGOCIOMV STARTED ***')
 
 syslog.syslog('==> Checking for code changes...')
 
-gitPull = Popen(['cd /home/pi/negociomv-python/ && git pull'], shell=True, stdin=None, stdout=None, stderr=None, bufsize=-1)
+gitPull = Popen(['cd /home/pi/negociomv-python/ && git stash && git pull'], shell=True, stdin=None, stdout=None, stderr=None, bufsize=-1)
 
 # syslog.syslog('==> Restarting modem...')
    
