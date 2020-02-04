@@ -85,11 +85,10 @@ def ProcessData():
             #ticket_latest = sorted(list_ticket)[-1]
             #ticket_latest_filename = os.path.basename(ticket_latest)
 
-            createBigCsv = Popen(['sed \'\' /home/pi/temp_files/TICKET#/*.CSV > /home/pi/temp_files/TICKET#/bigfile.csv'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
-            time.sleep(5);
-
-            ticket_file = {'name': 'bigfile.csv', 'parents': ['1KChS1VhzSPdffXQ2u3D4YVt9Bw8mUInl']}
-            ticket_media = MediaFileUpload('/home/pi/temp_files/TICKET#/bigfile.csv', mimetype='text/csv')
+            createBigCsv = Popen(['sed \'\' /home/pi/temp_files/TICKET#/*.CSV > /home/pi/temp_files/TICKET#/bigfile.csv && lzma -c --stdout /home/pi/temp_files/TICKET#/bigfile.csv>/home/pi/temp_files/TICKET#/bigfile.lzma'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
+            time.sleep(7);
+            ticket_file = {'name': 'bigfile.lzma', 'parents': ['1KChS1VhzSPdffXQ2u3D4YVt9Bw8mUInl']}
+            ticket_media = MediaFileUpload('/home/pi/temp_files/TICKET#/bigfile.lzma', mimetype='text/csv')
             ticket_upload = service.files().create(body=ticket_file, media_body=ticket_media, fields='id').execute()
             
             syslog.syslog ('==> TICKET File ID: %s' % (ticket_upload.get('id')))      
