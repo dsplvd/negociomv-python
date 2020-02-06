@@ -57,7 +57,7 @@ def ProcessData():
             # completed_latest_filename = os.path.basename(completed_latest)
 
             completed_latest = '/home/pi/temp_files/COMPLETED/'+str(datetime.now().year)+'MO'+str(datetime.now().month)+'.CSV'
-            completed_latest_filename = str(datetime.now().year)+'MO'+str(datetime.now().month)+'.CSV'
+            completed_latest_filename = str(datetime.now().year)+'MO0'+str(datetime.now().month)+'.CSV'
 
             if os.path.isfile(completed_latest_filename):
 
