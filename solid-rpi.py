@@ -59,7 +59,7 @@ def ProcessData():
             completed_latest = '/home/pi/temp_files/COMPLETED/'+str(datetime.now().year)+'MO0'+str(datetime.now().month)+'.CSV'
             completed_latest_filename = str(datetime.now().year)+'MO0'+str(datetime.now().month)+'.CSV'
 
-            if os.path.isfile(completed_latest_filename):
+            if os.path.isfile(completed_latest):
 
               completed_file = {'name': completed_latest_filename, 'parents': ['1iuLUfvco6cMEo5CmwHj3X-jFis27CgZE']}
               completed_media = MediaFileUpload(completed_latest, mimetype='text/csv')
