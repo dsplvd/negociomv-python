@@ -91,8 +91,6 @@ def ProcessData():
 
             completed_latest_filename = str(datetime.now().year)+'MO'+str(datetime.now().month)+'.CSV'
 
-	    print(completed_latest)
-
 
             if os.path.isfile(completed_latest):
 
