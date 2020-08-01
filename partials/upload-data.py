@@ -18,8 +18,6 @@ from google.auth.transport.requests import Request
 from apiclient.http import MediaFileUpload
 from apiclient.http import MediaFileUpload
 
-import RPi.GPIO as GPIO
-
 def ProcessData():
     syslog.syslog("==> Waiting for files...")
     time.sleep(15)
@@ -52,16 +50,12 @@ def ProcessData():
           list_completed = glob.glob('/home/pi/temp_files/COMPLETED/*.CSV')
           if len(list_completed) != 0:
 
-            # completed_latest = max(list_completed, key=os.path.getctime)
-            # completed_latest = sorted(list_completed)[-1]
-            # completed_latest_filename = os.path.basename(completed_latest)
-
             completed_latest = '/home/pi/temp_files/COMPLETED/'+str(datetime.now().year)+'MO'+str(datetime.now().month)+'.CSV'
             completed_latest_filename = str(datetime.now().year)+'MO'+str(datetime.now().month)+'.CSV'
 
             if os.path.isfile(completed_latest_filename):
 
-              completed_file = {'name': completed_latest_filename, 'parents': ['1iuLUfvco6cMEo5CmwHj3X-jFis27CgZE']}
+              completed_file = {'name': completed_latest_filename, 'parents': [completedFolder]}
               completed_media = MediaFileUpload(completed_latest, mimetype='text/csv')
               completed_upload = service.files().create(body=completed_file, media_body=completed_media, fields='id').execute()
             
@@ -81,13 +75,9 @@ def ProcessData():
           list_ticket = glob.glob('/home/pi/temp_files/TICKET#/*.CSV')
           if len(list_ticket) != 0:
 
-            #ticket_latest = max(list_ticket, key=os.path.getctime)
-            #ticket_latest = sorted(list_ticket)[-1]
-            #ticket_latest_filename = os.path.basename(ticket_latest)
-
             createBigCsv = Popen(['sed \'\' /home/pi/temp_files/TICKET#/*.CSV > /home/pi/temp_files/TICKET#/bigfile.csv'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
 
-            ticket_file = {'name': 'bigfile.csv', 'parents': ['1KChS1VhzSPdffXQ2u3D4YVt9Bw8mUInl']}
+            ticket_file = {'name': 'bigfile.csv', 'parents': [ticketFolder]}
             ticket_media = MediaFileUpload('/home/pi/temp_files/TICKET#/bigfile.csv', mimetype='text/csv')
             ticket_upload = service.files().create(body=ticket_file, media_body=ticket_media, fields='id').execute()
             
@@ -131,16 +121,7 @@ class ModHandler(pyinotify.ProcessEvent):
 
     def _upload_files(self):
         syslog.syslog('==> Processing USB Storage, ignoring further modifications...')
-        # runCompleteFlow = Popen(['python /home/pi/negociomv-python/complete.py'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
-        # output, error = runCompleteFlow.communicate()
-        # if runCompleteFlow.returncode == 0:
-        #     syslog.syslog('==> Files uploaded successfully')
-        #     self.count = 0
-        # elif runCompleteFlow.returncode == 1:
-        #     syslog.syslog('==> Upload failed: %s ***' % (error))
-        #     self.count = 0
         ProcessData()
-        # self.count = 0
 
     def _run_cmd(self):
         syslog.syslog('==> Uploading files..., Watchdog disabled')
@@ -159,6 +140,22 @@ class ModHandler(pyinotify.ProcessEvent):
         self.count +=1
 
 syslog.syslog('*** NEGOCIOMV STARTED ***')
+
+syslog.syslog('==> Retrieving folder names...')
+
+homePath = os.path.expanduser("~")
+
+if os.path.isfile(homePath + '/completed-folder'):
+  completedFolder = file_get_contents(homePath + '/completed-folder').rstrip()
+
+  else: 
+  syslog.syslog('==> Complete folder not set')
+  
+if os.path.isfile(homePath + '/ticket-folder'):
+  ticketFolder = file_get_contents(homePath + '/ticket-folder').rstrip()
+
+  else:
+  syslog.syslog('==> Ticket folder not set')
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 

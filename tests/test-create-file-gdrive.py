@@ -8,6 +8,20 @@ import json
 import requests
 from apiclient.http import MediaFileUpload
 
+homePath = os.path.expanduser("~")
+
+if os.path.isfile(homePath + '/completed-folder'):
+  completedFolder = file_get_contents(homePath + '/completed-folder').rstrip()
+
+  else: 
+  syslog.syslog('==> Complete folder not set')
+  
+if os.path.isfile(homePath + '/ticket-folder'):
+  ticketFolder = file_get_contents(homePath + '/ticket-folder').rstrip()
+
+  else:
+  syslog.syslog('==> Ticket folder not set')
+
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -20,8 +34,8 @@ def main():
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+    if os.path.exists('../token.pickle'):
+        with open('../token.pickle', 'rb') as token:
             creds = pickle.load(token)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
@@ -29,21 +43,17 @@ def main():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                '../credentials.json', SCOPES)
             creds = flow.run_local_server()
         # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
+        with open('../token.pickle', 'wb') as token:
             pickle.dump(creds, token)
 
     service = build('drive', 'v3', credentials=creds)
 
-    file_metadata = {'name': 'README.md'}
-    media = MediaFileUpload('./README.md',
+    file_metadata = {'name': 'README.md', 'parents': [completedFolder]}
+    media = MediaFileUpload('../README.md',
                             mimetype='text/plain')
-
-    #check_if_already_exists = service.files().list(q="name='{file_metadata.name}'", fields="files(id, name)", supportsTeamDrives=True, includeTeamDriveItems=True).execute()
-
-    #print ('existe: %s' % (check_if_already_exists))
 
     file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
     

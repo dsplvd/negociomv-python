@@ -18,6 +18,13 @@ from google.auth.transport.requests import Request
 from apiclient.http import MediaFileUpload
 from apiclient.http import MediaFileUpload
 
+def file_get_contents(filename):
+  if os.path.exists(filename):
+    fp = open(filename, "r")
+    content = fp.read()
+    fp.close()
+    return content
+
 def ProcessData():
     syslog.syslog("==> Waiting for files...")
     time.sleep(15)
@@ -31,6 +38,7 @@ def ProcessData():
 
     mountFilesystem = Popen(['mkdir -p /mnt/usbfat32 && sudo mount -o ro /home/pi/piusb.bin /mnt/usbfat32'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
     output, error = mountFilesystem.communicate()
+
     if mountFilesystem.returncode == 0:
       syslog.syslog("==> Filesystem mounted, syncing files...")
       syncFiles = Popen(['rm -rf /home/pi/temp_files && mkdir /home/pi/temp_files && rsync -Irc --exclude ".*" /mnt/usbfat32/ /home/pi/temp_files/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
@@ -56,7 +64,8 @@ def ProcessData():
 
             if os.path.isfile(completed_latest):
 
-              completed_file = {'name': completed_latest_filename, 'parents': ['1iuLUfvco6cMEo5CmwHj3X-jFis27CgZE']}
+              # completed_file = {'name': completed_latest_filename, 'parents': ['1iuLUfvco6cMEo5CmwHj3X-jFis27CgZE']}
+              completed_file = {'name': completed_latest_filename, 'parents': [completedFolder]}
               completed_media = MediaFileUpload(completed_latest, mimetype='text/csv')
               completed_upload = service.files().create(body=completed_file, media_body=completed_media, fields='id').execute()
 
@@ -78,7 +87,8 @@ def ProcessData():
 
             createBigCsv = Popen(['sed \'\' /home/pi/temp_files/TICKET#/*.CSV > /home/pi/temp_files/TICKET#/bigfile.csv && lzma -c --stdout /home/pi/temp_files/TICKET#/bigfile.csv>/home/pi/temp_files/TICKET#/bigfile.lzma'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
             time.sleep(7);
-            ticket_file = {'name': 'bigfile.lzma', 'parents': ['1KChS1VhzSPdffXQ2u3D4YVt9Bw8mUInl']}
+            # ticket_file = {'name': 'bigfile.lzma', 'parents': ['1KChS1VhzSPdffXQ2u3D4YVt9Bw8mUInl']}
+            ticket_file = {'name': 'bigfile.lzma', 'parents': [ticketFolder]}
             ticket_media = MediaFileUpload('/home/pi/temp_files/TICKET#/bigfile.lzma', mimetype='text/csv')
             ticket_upload = service.files().create(body=ticket_file, media_body=ticket_media, fields='id').execute()
 
@@ -145,6 +155,22 @@ syslog.syslog('*** NEGOCIOMV STARTED ***')
 syslog.syslog('==> Checking for code changes...')
 
 gitPull = Popen(['cd /home/pi/negociomv-python/ && git stash && git pull'], shell=True, stdin=None, stdout=None, stderr=None, bufsize=-1)
+
+syslog.syslog('==> Retrieving folder names...')
+
+homePath = os.path.expanduser("~")
+
+if os.path.isfile(homePath + '/completed-folder'):
+  completedFolder = file_get_contents(homePath + '/completed-folder').rstrip()
+
+  else: 
+  syslog.syslog('==> Complete folder not set')
+  
+if os.path.isfile(homePath + '/ticket-folder'):
+  ticketFolder = file_get_contents(homePath + '/ticket-folder').rstrip()
+
+  else:
+  syslog.syslog('==> Ticket folder not set')
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
