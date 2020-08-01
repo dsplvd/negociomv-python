@@ -18,8 +18,6 @@ from google.auth.transport.requests import Request
 from apiclient.http import MediaFileUpload
 from apiclient.http import MediaFileUpload
 
-import RPi.GPIO as GPIO
-
 def ProcessData():
     syslog.syslog("==> Waiting for files...")
     time.sleep(15)
@@ -50,11 +48,8 @@ def ProcessData():
 
           # *** COMPLETED ***
           list_completed = glob.glob('/home/pi/temp_files/COMPLETED/*.CSV')
-          if len(list_completed) != 0:
 
-            # completed_latest = max(list_completed, key=os.path.getctime)
-            # completed_latest = sorted(list_completed)[-1]
-            # completed_latest_filename = os.path.basename(completed_latest)
+          if len(list_completed) != 0:
 
             completed_latest = '/home/pi/temp_files/COMPLETED/'+str(datetime.now().year)+'MO'+str('%02d' % datetime.now().month)+'.CSV'
             completed_latest_filename = str(datetime.now().year)+'MO'+str('%02d' % datetime.now().month)+'.CSV'
@@ -64,8 +59,8 @@ def ProcessData():
               completed_file = {'name': completed_latest_filename, 'parents': ['1iuLUfvco6cMEo5CmwHj3X-jFis27CgZE']}
               completed_media = MediaFileUpload(completed_latest, mimetype='text/csv')
               completed_upload = service.files().create(body=completed_file, media_body=completed_media, fields='id').execute()
-            
-              syslog.syslog ('==> COMPLETED File ID: %s' % (completed_upload.get('id')))      
+
+              syslog.syslog ('==> COMPLETED File ID: %s' % (completed_upload.get('id')))
 
               syslog.syslog("==> COMPLETED processed, DELETING BIN FILES FOR GOOD MEASURE")
               deleteBinFiles = Popen(['mkdir -p /mnt/usbfat32 && sudo mount -o rw /home/pi/piusb.bin /mnt/usbfat32 && sudo rm -rf /mnt/usbfat32/COMPLETED/*.* && sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
@@ -81,25 +76,21 @@ def ProcessData():
           list_ticket = glob.glob('/home/pi/temp_files/TICKET#/*.CSV')
           if len(list_ticket) != 0:
 
-            #ticket_latest = max(list_ticket, key=os.path.getctime)
-            #ticket_latest = sorted(list_ticket)[-1]
-            #ticket_latest_filename = os.path.basename(ticket_latest)
-
             createBigCsv = Popen(['sed \'\' /home/pi/temp_files/TICKET#/*.CSV > /home/pi/temp_files/TICKET#/bigfile.csv && lzma -c --stdout /home/pi/temp_files/TICKET#/bigfile.csv>/home/pi/temp_files/TICKET#/bigfile.lzma'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
             time.sleep(7);
             ticket_file = {'name': 'bigfile.lzma', 'parents': ['1KChS1VhzSPdffXQ2u3D4YVt9Bw8mUInl']}
             ticket_media = MediaFileUpload('/home/pi/temp_files/TICKET#/bigfile.lzma', mimetype='text/csv')
             ticket_upload = service.files().create(body=ticket_file, media_body=ticket_media, fields='id').execute()
-            
-            syslog.syslog ('==> TICKET File ID: %s' % (ticket_upload.get('id')))      
+
+            syslog.syslog ('==> TICKET File ID: %s' % (ticket_upload.get('id')))
 
             syslog.syslog("==> TICKET processed, done")
 
             deleteTicketFiles = Popen(['mkdir -p /mnt/usbfat32 && sudo mount -o rw /home/pi/piusb.bin /mnt/usbfat32 && sudo rm -rf /mnt/usbfat32/TICKET#/*.* && sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
 
-            
+
           else:
-            syslog.syslog("==> No TICKET# to upload, done")        
+            syslog.syslog("==> No TICKET# to upload, done")
 
         elif syncFiles.returncode == 1:
            syslog.syslog('==> Cant find %s' % (error))
@@ -131,16 +122,7 @@ class ModHandler(pyinotify.ProcessEvent):
 
     def _upload_files(self):
         syslog.syslog('==> Processing USB Storage, ignoring further modifications...')
-        # runCompleteFlow = Popen(['python /home/pi/negociomv-python/complete.py'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
-        # output, error = runCompleteFlow.communicate()
-        # if runCompleteFlow.returncode == 0:
-        #     syslog.syslog('==> Files uploaded successfully')
-        #     self.count = 0
-        # elif runCompleteFlow.returncode == 1:
-        #     syslog.syslog('==> Upload failed: %s ***' % (error))
-        #     self.count = 0
         ProcessData()
-        # self.count = 0
 
     def _run_cmd(self):
         syslog.syslog('==> Uploading files..., Watchdog disabled')
@@ -164,23 +146,10 @@ syslog.syslog('==> Checking for code changes...')
 
 gitPull = Popen(['cd /home/pi/negociomv-python/ && git stash && git pull'], shell=True, stdin=None, stdout=None, stderr=None, bufsize=-1)
 
-# syslog.syslog('==> Restarting modem...')
-   
-# GPIO.setup(26, GPIO.OUT)
-   
-# GPIO.output(26, True)
-# time.sleep(2)
-# GPIO.output(26, False)
-   
-# GPIO.cleanup()
-
-#syslog.syslog('==> Starting PPP interface...')
-
-#startPPP = Popen(['sudo pon huawei'], shell=True, stdin=None, stdout=None, stderr=None, bufsize=-1)
-
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
 creds = None
+
 # The file token.pickle stores the user's access and refresh tokens, and is
 # created automatically when the authorization flow completes for the first
 # time.
