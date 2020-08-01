@@ -24,6 +24,13 @@ else:
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
+def file_get_contents(filename):
+  if os.path.exists(filename):
+    fp = open(filename, "r")
+    content = fp.read()
+    fp.close()
+    return content
+
 def main():
     """Shows basic usage of the Drive v3 API.
     Prints the names and ids of the first 10 files the user has access to.
