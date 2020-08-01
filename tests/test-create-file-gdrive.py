@@ -8,22 +8,6 @@ import json
 import requests
 from apiclient.http import MediaFileUpload
 
-homePath = os.path.expanduser("~")
-
-if os.path.isfile(homePath + '/completed-folder'):
-    completedFolder = file_get_contents(homePath + '/completed-folder').rstrip()
-else:
-    syslog.syslog('==> Complete folder not set')
-  
-if os.path.isfile(homePath + '/ticket-folder'):
-    ticketFolder = file_get_contents(homePath + '/ticket-folder').rstrip()
-else:
-    syslog.syslog('==> Ticket folder not set')
-
-
-# If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/drive']
-
 def file_get_contents(filename):
   if os.path.exists(filename):
     fp = open(filename, "r")
@@ -31,7 +15,27 @@ def file_get_contents(filename):
     fp.close()
     return content
 
+# If modifying these scopes, delete the file token.pickle.
+SCOPES = ['https://www.googleapis.com/auth/drive']
+
+
+
 def main():
+
+
+    homePath = os.path.expanduser("~")
+
+    if os.path.isfile(homePath + '/completed-folder'):
+        completedFolder = file_get_contents(homePath + '/completed-folder').rstrip()
+    else:
+        syslog.syslog('==> Complete folder not set')
+      
+    if os.path.isfile(homePath + '/ticket-folder'):
+        ticketFolder = file_get_contents(homePath + '/ticket-folder').rstrip()
+    else:
+        syslog.syslog('==> Ticket folder not set')
+
+    
     """Shows basic usage of the Drive v3 API.
     Prints the names and ids of the first 10 files the user has access to.
     """
