@@ -1,0 +1,17 @@
+/dev/ttyAMA0
+115200
+nodetach
+connect '/usr/sbin/chat -v -f /etc/chatscripts/gprs2 -T m2m.movistar.cl'
+debug
+noipdefault
+usepeerdns
+defaultroute
+replacedefaultroute
+persist
+noauth
+user movistar
+local
+nocrtscts
+#noccp
+#novj
+#novjccomp
