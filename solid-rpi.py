@@ -75,7 +75,7 @@ def ProcessData():
               deleteBinFiles = Popen(['mkdir -p /mnt/usbfat32 && sudo mount -o rw /home/pi/piusb.bin /mnt/usbfat32 && sudo rm -rf /mnt/usbfat32/COMPLETED/*.* && sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
 
             else:
-              syslog.syslog("==> FILE NOT FOUND, DELETING BIN FILES")
+              syslog.syslog("==> " + completed_latest + " FILE NOT FOUND, DELETING BIN FILES")
               deleteBinFiles = Popen(['mkdir -p /mnt/usbfat32 && sudo mount -o rw /home/pi/piusb.bin /mnt/usbfat32 && sudo rm -rf /mnt/usbfat32/COMPLETED/*.* && sudo umount /mnt/usbfat32/'], shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=-1)
 
           else:
