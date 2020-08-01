@@ -18,7 +18,12 @@ from google.auth.transport.requests import Request
 from apiclient.http import MediaFileUpload
 from apiclient.http import MediaFileUpload
 
-import RPi.GPIO as GPIO
+def file_get_contents(filename):
+  if os.path.exists(filename):
+    fp = open(filename, "r")
+    content = fp.read()
+    fp.close()
+    return content
 
 def ProcessData():
     syslog.syslog("==> Waiting for files...")
@@ -123,16 +128,14 @@ syslog.syslog('==> Retrieving folder names...')
 homePath = os.path.expanduser("~")
 
 if os.path.isfile(homePath + '/completed-folder'):
-  completedFolder = file_get_contents(homePath + '/completed-folder').rstrip()
-
-  else: 
-  syslog.syslog('==> Complete folder not set')
+    completedFolder = file_get_contents(homePath + '/completed-folder').rstrip()
+else: 
+    syslog.syslog('==> Complete folder not set')
   
 if os.path.isfile(homePath + '/ticket-folder'):
-  ticketFolder = file_get_contents(homePath + '/ticket-folder').rstrip()
-
-  else:
-  syslog.syslog('==> Ticket folder not set')
+    ticketFolder = file_get_contents(homePath + '/ticket-folder').rstrip()
+else:
+    syslog.syslog('==> Ticket folder not set')
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
