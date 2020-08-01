@@ -11,15 +11,13 @@ from apiclient.http import MediaFileUpload
 homePath = os.path.expanduser("~")
 
 if os.path.isfile(homePath + '/completed-folder'):
-  completedFolder = file_get_contents(homePath + '/completed-folder').rstrip()
-
-    else: 
+    completedFolder = file_get_contents(homePath + '/completed-folder').rstrip()
+else:
     syslog.syslog('==> Complete folder not set')
   
 if os.path.isfile(homePath + '/ticket-folder'):
-  ticketFolder = file_get_contents(homePath + '/ticket-folder').rstrip()
-
-    else:
+    ticketFolder = file_get_contents(homePath + '/ticket-folder').rstrip()
+else:
     syslog.syslog('==> Ticket folder not set')
 
 
